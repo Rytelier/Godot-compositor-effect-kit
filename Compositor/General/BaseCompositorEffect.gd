@@ -191,7 +191,10 @@ func compile_shader_from_text(p_file_path: String, p_replace_lines: Dictionary[S
 		
 		return RID()
 	
-	return rd.shader_create_from_spirv(spirv)
+	var shader = rd.shader_create_from_spirv(spirv)
+	add_rid_to_free(shader, "shader: %s" % p_file_path)
+	
+	return shader
 
 
 ## Use after 'create_shader' or 'compile_shader_from_text'.
@@ -258,6 +261,7 @@ func create_texture_scene_buffer(
 	# Textures appear to be automatically freed at the time of NOTIFICATION_PREDELETE.
 	# Attempting to free the texture's RID will trigger errors.
 	# So we will not add its RID to rids_to_free.
+	add_rid_to_free(texture_image, "tex scene buffer " + str(_rids_to_free.size()))
 	return texture_image
 
 
@@ -266,10 +270,12 @@ func create_texture(
 		p_format: RenderingDevice.DataFormat = RenderingDevice.DATA_FORMAT_R16G16B16A16_SFLOAT,
 		p_usage_bits: int = RenderingDevice.TEXTURE_USAGE_SAMPLING_BIT | RenderingDevice.TEXTURE_USAGE_STORAGE_BIT,
 		) -> RID:
-	return rd.texture_create(
+	var texture: RID = rd.texture_create(
 		get_texture_format(p_texture_size if p_texture_size != Vector2i.ZERO else render_size,
 		p_format, p_usage_bits)
 		, RDTextureView.new())
+	add_rid_to_free(texture, "tex " + str(_rids_to_free.size()))
+	return texture
 
 
 func get_texture_format(p_texture_size: Vector2i, p_format: RenderingDevice.DataFormat, p_usage_bits: int) -> RDTextureFormat:
