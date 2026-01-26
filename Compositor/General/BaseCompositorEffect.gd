@@ -433,6 +433,16 @@ func get_color_image_uniform(p_view: int, p_binding: int) -> RDUniform:
 	return color_image_uniform
 
 
+func get_color_sampler_uniform(p_view: int, p_sampler: RID, p_binding: int) -> RDUniform:
+	var color_image: RID = render_scene_buffers.get_color_layer(p_view)
+	var color_image_uniform: RDUniform = get_sampler_uniform(
+			color_image,
+			p_sampler,
+			p_binding,
+		)
+	return color_image_uniform
+
+
 func get_depth_sampler_uniform(p_view: int, p_sampler: RID, p_binding: int) -> RDUniform:
 	var depth_image: RID = render_scene_buffers.get_depth_layer(p_view)
 	var depth_sampler_uniform: RDUniform = get_sampler_uniform(
@@ -443,10 +453,10 @@ func get_depth_sampler_uniform(p_view: int, p_sampler: RID, p_binding: int) -> R
 	return depth_sampler_uniform
 
 
-func get_normal_sampler_uniform(p_view: int, p_sampler: RID, p_binding: int) -> RDUniform:
+func get_normal_sampler_uniform(p_sampler: RID, p_binding: int) -> RDUniform:
 	var normal_image: RID = render_scene_buffers.get_texture(
 			"forward_clustered",
-			"normal_roughness",
+			"normal_roughness"
 		)
 	var normal_sampler_uniform: RDUniform = get_sampler_uniform(
 			normal_image,
