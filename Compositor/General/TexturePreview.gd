@@ -57,7 +57,16 @@ func _render_view(view : int) -> void:
 			msg = "Ok"
 			texture = render_scene_buffers.get_texture(context, id)
 	elif effect_target:
-		var texture_from_target = effect_target.get(effect_texture_id)
+		var txid: String = effect_texture_id
+		var arridx: int = -1
+		txid = txid.strip_edges()
+		if txid.contains("["):
+			txid = txid.split("[")[0]
+			arridx = effect_texture_id.split("[")[1].replace("]", "").to_int()
+		
+		var texture_from_target = effect_target.get(txid)
+		if arridx != -1:
+			texture_from_target = texture_from_target[arridx]
 		if texture_from_target and texture_from_target is RID and rd.texture_is_valid(texture_from_target):
 			if texture_from_target.is_valid():
 				texture = texture_from_target
