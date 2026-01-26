@@ -262,9 +262,9 @@ func create_texture_scene_buffer(
 
 
 func create_texture(
+		p_texture_size: Vector2i = Vector2i.ZERO, 
 		p_format: RenderingDevice.DataFormat = RenderingDevice.DATA_FORMAT_R16G16B16A16_SFLOAT,
 		p_usage_bits: int = RenderingDevice.TEXTURE_USAGE_SAMPLING_BIT | RenderingDevice.TEXTURE_USAGE_STORAGE_BIT,
-		p_texture_size: Vector2i = Vector2i.ZERO, 
 		) -> RID:
 	return rd.texture_create(
 		get_texture_format(p_texture_size if p_texture_size != Vector2i.ZERO else render_size,
