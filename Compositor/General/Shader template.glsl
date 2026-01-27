@@ -22,14 +22,16 @@ layout(binding = 2) uniform SceneDataBlock {
 */
 
 void main() {
-	ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+	ivec2 coord = ivec2(gl_GlobalInvocationID.xy);
 	ivec2 size = ivec2(params.raster_size);
 
-	if (uv.x >= size.x || uv.y >= size.y) {
+	if (coord.x >= size.x || coord.y >= size.y) {
 		return;
 	}
 
-	vec4 color = imageLoad(color_image, uv);
+	//vec2 uv = (coord + 0.5) / size;
 
-	imageStore(color_image, uv, color);
+	vec4 color = imageLoad(color_image, coord);
+
+	imageStore(color_image, coord, color);
 }
