@@ -61,13 +61,18 @@ var _shader_file_paths: PackedStringArray
 #region Essentials
 func _notification(what):
 	if what == NOTIFICATION_PREDELETE:
-		_clean_rids()
+		for rid: RID in _rids_to_free:
+			if rid.is_valid():
+				if print_freed_rids:
+					print("freeing RID: %s: %s" % [rid.get_id(), _rids_to_free[rid]])
+				rd.free_rid(rid)
+		_rids_to_free.clear()
 		
 		if Engine.is_editor_hint():
 			EditorInterface.get_resource_filesystem().resources_reimported.disconnect(_reload.bind())
 
 
-func _clean_rids() -> void:
+func _clean_rids() -> void: # Repeated because calling this function on game exit gives null error
 	for rid: RID in _rids_to_free:
 		if rid.is_valid():
 			if print_freed_rids:
