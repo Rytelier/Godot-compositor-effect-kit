@@ -61,14 +61,19 @@ var _shader_file_paths: PackedStringArray
 #region Essentials
 func _notification(what):
 	if what == NOTIFICATION_PREDELETE:
-		for rid: RID in _rids_to_free:
-			if rid.is_valid():
-				if print_freed_rids:
-					print("freeing RID: %s: %s" % [rid.get_id(), _rids_to_free[rid]])
-				rd.free_rid(rid)
+		_clean_rids()
 		
 		if Engine.is_editor_hint():
 			EditorInterface.get_resource_filesystem().resources_reimported.disconnect(_reload.bind())
+
+
+func _clean_rids() -> void:
+	for rid: RID in _rids_to_free:
+		if rid.is_valid():
+			if print_freed_rids:
+				print("freeing RID: %s: %s" % [rid.get_id(), _rids_to_free[rid]])
+			rd.free_rid(rid)
+	_rids_to_free.clear()
 
 
 func _init():
@@ -82,6 +87,7 @@ func _init():
 func _reload(files: PackedStringArray):
 	for file in files:
 		if _shader_file_paths.has(file):
+			_clean_rids()
 			_initialize_resource()
 			RenderingServer.call_on_render_thread(_initialize_render_base)
 			return
