@@ -4,6 +4,10 @@ Create and debug compositor effects quickly
 ## Base compositor effect class
 Quickly setup a compositor effect with much less boilerplate code.
 
+Create textures, buffers and shader passes with one line of code.
+
+Hot reload on shader save.
+
 An example of an effect script:
 
 ```gdscript
