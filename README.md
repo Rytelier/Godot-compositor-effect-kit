@@ -12,9 +12,6 @@ extends R_BaseCompositorEffect
 class_name EffectGreyscale
 
 
-const shader_path = "res://Compositor/Demo greyscale/post_process_grayscale.glsl"
-
-
 @export_range(0, 1, 0.001) var amount: float = 1: 
 	set(v):
 		amount = v
@@ -22,6 +19,7 @@ const shader_path = "res://Compositor/Demo greyscale/post_process_grayscale.glsl
 
 
 # Shader and pipeline created on initialization
+const shader_path = "res://Compositor/Demo greyscale/post_process_grayscale.glsl"
 var shader: RID
 var pipeline: RID
 

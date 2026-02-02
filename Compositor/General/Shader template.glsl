@@ -14,8 +14,8 @@ layout(push_constant, std430) uniform Params {
 	float _;
 } params;
 
+//#include "../General/Includes/scene_data.glsl"
 /*
-#include "../General/Includes/scene_data.glsl"
 layout(binding = 2) uniform SceneDataBlock {
 	SceneData data;
 } scene;

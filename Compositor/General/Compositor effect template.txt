@@ -3,15 +3,13 @@ extends R_BaseCompositorEffect
 class_name YourEffectClassName
 
 
-const shader_path = "shader file path goes here"
-
-
 @export var some_property: float = 1: 
 	set(v):
 		some_property = v
 		update_push_constant()
 
 
+const shader_path = "shader file path goes here"
 var shader: RID
 var pipeline: RID
 
