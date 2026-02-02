@@ -196,7 +196,10 @@ func compile_shader_from_text(p_file_path: String, p_replace_lines: Dictionary[S
 	
 	var spirv = rd.shader_compile_spirv_from_source(source)
 	if spirv.compile_error_compute != "":
-		var text = source.source_compute.replace("\n", "\r\b") # Fix line separation in print
+		var text = ""
+		var lines = source.source_compute.split("\n")
+		for l in lines.size():
+			text += "{0}\t{1}\r\b".format([l, lines[l]]) # Print with line numbers
 		printerr(spirv.compile_error_compute + "\n")
 		print(text)
 		
