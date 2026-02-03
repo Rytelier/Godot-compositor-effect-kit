@@ -69,7 +69,7 @@ func _notification(what):
 		_rids_to_free.clear()
 		
 		if Engine.is_editor_hint():
-			EditorInterface.get_resource_filesystem().resources_reimported.disconnect(_reload.bind())
+			Engine.get_singleton("EditorInterface").get_resource_filesystem().resources_reimported.disconnect(_reload.bind())
 
 
 func _clean_rids() -> void: # Repeated because calling this function on game exit gives null error
@@ -85,8 +85,8 @@ func _init():
 	_initialize_resource()
 	RenderingServer.call_on_render_thread(_initialize_render_base)
 	
-	if (Engine.is_editor_hint() and not EditorInterface.get_resource_filesystem().resources_reimported.is_connected(_reload.bind())):
-		EditorInterface.get_resource_filesystem().resources_reimported.connect(_reload.bind())
+	if (Engine.is_editor_hint() and not Engine.get_singleton("EditorInterface").get_resource_filesystem().resources_reimported.is_connected(_reload.bind())):
+		Engine.get_singleton("EditorInterface").get_resource_filesystem().resources_reimported.connect(_reload.bind())
 
 
 func _reload(files: PackedStringArray):
