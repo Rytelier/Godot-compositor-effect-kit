@@ -63,7 +63,7 @@ func _render_size_changed() -> void:
 
 
 func update_push_constant() -> void:
-	push_constant = create_push_constant([render_size.x, render_size.y, amount])
+	push_constant = create_push_constant([Vector2(render_size), amount])
 
 ```
 
