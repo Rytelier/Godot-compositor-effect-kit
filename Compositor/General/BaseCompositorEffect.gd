@@ -302,6 +302,66 @@ func get_texture_format(p_texture_size: Vector2i, p_format: RenderingDevice.Data
 	return texture_format
 
 
+func array_to_bytes(p_data: Array) -> PackedByteArray:
+	var byte_data: PackedByteArray
+	
+	for value in p_data:
+		var type := typeof(value)
+		var byte_array: PackedByteArray
+		match type:
+			TYPE_INT:
+				byte_array.resize(4)
+				byte_array.encode_s32(0, value)
+			TYPE_BOOL:
+				byte_array.resize(4)
+				byte_array.encode_var(0, value)
+			TYPE_FLOAT:
+				byte_array.resize(4)
+				byte_array.encode_float(0, value)
+			TYPE_COLOR:
+				byte_array.resize(16)
+				byte_array.encode_float(0, value.r)
+				byte_array.encode_float(4, value.g)
+				byte_array.encode_float(8, value.b)
+				byte_array.encode_float(12, value.a)
+			TYPE_VECTOR2:
+				byte_array.resize(8)
+				byte_array.encode_float(0, value.x)
+				byte_array.encode_float(4, value.y)
+			TYPE_VECTOR2I:
+				byte_array.resize(8)
+				byte_array.encode_s32(0, value.x)
+				byte_array.encode_s32(4, value.y)
+			TYPE_VECTOR3:
+				byte_array.resize(12)
+				byte_array.encode_float(0, value.x)
+				byte_array.encode_float(4, value.y)
+				byte_array.encode_float(8, value.z)
+			TYPE_VECTOR3I:
+				byte_array.resize(12)
+				byte_array.encode_s32(0, value.x)
+				byte_array.encode_s32(4, value.y)
+				byte_array.encode_s32(8, value.z)
+			TYPE_VECTOR4:
+				byte_array.resize(16)
+				byte_array.encode_float(0, value.x)
+				byte_array.encode_float(4, value.y)
+				byte_array.encode_float(8, value.z)
+				byte_array.encode_float(12, value.w)
+			TYPE_VECTOR4I:
+				byte_array.resize(16)
+				byte_array.encode_s32(0, value.x)
+				byte_array.encode_s32(4, value.y)
+				byte_array.encode_s32(8, value.z)
+				byte_array.encode_s32(12, value.w)
+			_:
+				push_error("[DFOutlineCE:create_uniform_buffer()] Unhandled data type found: %s" % type)
+				continue
+
+		byte_data.append_array(byte_array)
+	return byte_data
+
+
 ## Individual assignments in a uniform buffer must be aligned to 16 bytes.
 ## However, you can assign the whole buffer to a struct, and that struct can contain
 ## elements aligned at 4 bytes (== one 32-bit float, which is the smallest data size
@@ -312,30 +372,7 @@ func get_texture_format(p_texture_size: Vector2i, p_format: RenderingDevice.Data
 ## Automatic conversion for Vector2's and Vector3's is not included here.
 ## We should convert them to Vector4 manually so we can keep track of their alignment.
 func create_uniform_buffer(p_data: Array) -> RID:
-	var buffer_data: PackedByteArray
-
-	for value in p_data:
-		var type := typeof(value)
-		var byte_array: PackedByteArray
-		match type:
-			TYPE_INT:
-				# PackedInt32Array does not convert the values as expected.
-				byte_array = PackedFloat32Array([float(value)]).to_byte_array()
-			TYPE_BOOL:
-				byte_array = PackedFloat32Array([float(value)]).to_byte_array()
-			TYPE_FLOAT:
-				byte_array = PackedFloat32Array([value]).to_byte_array()
-			TYPE_COLOR:
-				byte_array = PackedColorArray([value]).to_byte_array()
-			TYPE_VECTOR4:
-				byte_array = PackedVector4Array([value]).to_byte_array()
-			TYPE_VECTOR4I:
-				byte_array = PackedVector4Array([Vector4(value)]).to_byte_array()
-			_:
-				push_error("[DFOutlineCE:create_uniform_buffer()] Unhandled data type found: %s" % type)
-				continue
-
-		buffer_data.append_array(byte_array)
+	var buffer_data: PackedByteArray = array_to_bytes(p_data)
 
 	var size_before := buffer_data.size()
 
@@ -409,8 +446,8 @@ func run_compute_shader(p_label: String, p_shader: RID,
 	rd.draw_command_end_label()
 
 
-func create_push_constant(p_push_constant: PackedFloat32Array) -> PackedByteArray:
-	var byte_array: PackedByteArray = p_push_constant.to_byte_array()
+func create_push_constant(p_push_constant: Array) -> PackedByteArray:
+	var byte_array: PackedByteArray = array_to_bytes(p_push_constant)
 	var size_before: int = byte_array.size()
 	if byte_array.size() % 16:
 		byte_array.resize(ceili(float(byte_array.size())/16.0) * 16)
