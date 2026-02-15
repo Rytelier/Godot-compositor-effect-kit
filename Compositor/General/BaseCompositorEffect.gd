@@ -190,6 +190,20 @@ func compile_shader_from_text(p_file_path: String, p_replace_lines: Dictionary[S
 	for key in p_replace_lines.keys():
 		code = code.replace(key, p_replace_lines[key])
 	
+	var include_defines: PackedStringArray
+	for line in code.split("\n"):
+		if line.begins_with("#include"):
+			include_defines.append(line)
+	
+	# Include file support
+	for include in include_defines:
+		var include_path: String = include.replace("#include", "").replace("\"", "").strip_edges()
+		include_path = p_file_path.path_join("..").path_join(include_path).simplify_path()
+		if FileAccess.file_exists(include_path):
+			code = code.replace(include, FileAccess.open(include_path, FileAccess.READ).get_as_text())
+		else:
+			printerr("CompositorEffect: include path doesn't exist: " + include_path)
+	
 	var source: RDShaderSource = RDShaderSource.new()
 	source.language = RenderingDevice.SHADER_LANGUAGE_GLSL
 	source.source_compute = code
