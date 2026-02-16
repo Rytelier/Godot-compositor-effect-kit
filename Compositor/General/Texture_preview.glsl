@@ -8,7 +8,7 @@ layout(binding = 1) uniform sampler2D image_in;
 
 layout(push_constant, std430) uniform Params {
 	vec2 size;
-	float channel;
+	int channel;
 	float _;
 } params;
 

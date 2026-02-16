@@ -85,7 +85,7 @@ func _render_view(view : int) -> void:
 	
 	run_compute_shader("Preview", shader, pipeline, 
 	[[get_color_image_uniform(view, 0), get_sampler_uniform(texture, nearest_sampler if !linear else linear_sampler, 1)]],
-	create_push_constant([render_size.x, render_size.y, channel]))
+	create_push_constant([Vector2(render_size), int(channel)]))
 
 
 func _render_setup() -> void: pass
