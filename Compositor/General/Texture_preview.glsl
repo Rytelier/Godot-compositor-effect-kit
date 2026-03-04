@@ -17,7 +17,7 @@ void main() {
 	
 	ivec2 coord = ivec2(gl_GlobalInvocationID.xy);
 
-	vec4 img = texture(image_in, coord / vec2(params.size.x, params.size.y));
+	vec4 img = texture(image_in, (coord + 0.5) / vec2(params.size.x, params.size.y));
 	int channel = int(params.channel);
 
 	if(channel == -1){
