@@ -8,6 +8,7 @@ extends CompositorEffect
 @export var print_buffer_resize: bool = false
 ## Use to troubleshoot errors from freeing invalid RIDs.
 @export var print_freed_rids: bool = false
+@export_tool_button("Print present rids", "RDShaderFile") var print_rids_button = print_present_rids
 
 
 var nearest_sampler: RID
@@ -142,6 +143,11 @@ func add_rid_to_free(p_rid: RID, p_label: String = "") -> void:
 	_rids_to_free[p_rid] = p_label
 
 
+func print_present_rids():
+	for rid in _rids_to_free.keys():
+		prints(rid, _rids_to_free[rid])
+
+
 ## rid.is_valid() returns true for previously freed rids.
 ## This function is used to track rids as they are freed to prevent errors
 ## when attempting to free them.
@@ -171,11 +177,21 @@ func create_sampler(
 
 
 ## Create shader from imported glsl file path.
-func create_shader(p_file_path: String) -> RID:
+func create_shader(p_file_path: String, p_id = "") -> RID:
 	var shader_file: RDShaderFile = load(p_file_path)
 	var shader_spirv: RDShaderSPIRV = shader_file.get_spirv()
+	
+	var shader_id = "shader: %s" % p_file_path
+	if p_id != "":
+		shader_id = p_id
+	
+	if _rids_to_free.values().has(shader_id):
+		for key in _rids_to_free.keys():
+			if _rids_to_free[key] == shader_id:
+				free_rid(key)
+	
 	var shader: RID = rd.shader_create_from_spirv(shader_spirv)
-	add_rid_to_free(shader, "shader: %s" % p_file_path)
+	add_rid_to_free(shader, shader_id)
 	_shader_file_paths.append(p_file_path)
 	
 	return shader
@@ -183,7 +199,7 @@ func create_shader(p_file_path: String) -> RID:
 
 ## For loading shader file + replacing its defines.
 ## When not using defines use 'create_shader' instead.
-func compile_shader_from_text(p_file_path: String, p_replace_lines: Dictionary[String, String]) -> RID:
+func compile_shader_from_text(p_file_path: String, p_replace_lines: Dictionary[String, String], p_id = "") -> RID:
 	var code: String = FileAccess.open(p_file_path, FileAccess.READ).get_as_text()
 	
 	code = code.replace("#[compute]", "") # Needs to be in imported file, but not for compiling
@@ -219,8 +235,17 @@ func compile_shader_from_text(p_file_path: String, p_replace_lines: Dictionary[S
 		
 		return RID()
 	
+	var shader_id: String = "shader: %s" % p_file_path
+	if p_id != "":
+		shader_id = p_id
+	
+	if _rids_to_free.values().has(shader_id):
+		for key in _rids_to_free.keys():
+			if _rids_to_free[key] == shader_id:
+				free_rid(key)
+	
 	var shader = rd.shader_create_from_spirv(spirv)
-	add_rid_to_free(shader, "shader: %s" % p_file_path)
+	add_rid_to_free(shader, shader_id)
 	
 	return shader
 
@@ -385,7 +410,7 @@ func array_to_bytes(p_data: Array) -> PackedByteArray:
 ##
 ## Automatic conversion for Vector2's and Vector3's is not included here.
 ## We should convert them to Vector4 manually so we can keep track of their alignment.
-func create_uniform_buffer(p_data: Array) -> RID:
+func create_uniform_buffer(p_data: Array, p_id: String = "ubo") -> RID:
 	var buffer_data: PackedByteArray = array_to_bytes(p_data)
 
 	var size_before := buffer_data.size()
@@ -401,7 +426,7 @@ func create_uniform_buffer(p_data: Array) -> RID:
 		print("\tBytes added: %s = %s floats." % [size_change, float(size_change)/4.0])
 
 	var ubo: RID = rd.uniform_buffer_create(buffer_data.size(), buffer_data)
-	add_rid_to_free(ubo, "ubo")
+	add_rid_to_free(ubo, p_id)
 	return ubo
 
 
