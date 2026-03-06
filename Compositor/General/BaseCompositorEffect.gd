@@ -246,6 +246,7 @@ func compile_shader_from_text(p_file_path: String, p_replace_lines: Dictionary[S
 	
 	var shader = rd.shader_create_from_spirv(spirv)
 	add_rid_to_free(shader, shader_id)
+	_shader_file_paths.append(p_file_path)
 	
 	return shader
 
