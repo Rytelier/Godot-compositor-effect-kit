@@ -9,7 +9,16 @@ layout(binding = 1) uniform sampler2D image_in;
 layout(push_constant, std430) uniform Params {
 	vec2 size;
 	int channel;
-	float _;
+	int error_debug;
+	int _;
+
+	float nanR;
+	float nanG;
+	float nanB;
+	float infR;
+	float infG;
+	float infB;
+	float error_fade;
 } params;
 
 
@@ -19,6 +28,20 @@ void main() {
 
 	vec4 img = texture(image_in, (coord + 0.5) / vec2(params.size.x, params.size.y));
 	int channel = int(params.channel);
+
+	if (params.error_debug == 1)
+	{
+		img.rgb = img.rgb * params.error_fade;
+		img.a = 1.0;
+		if (isnan(img.r) || isnan(img.g) || isnan(img.b) || isnan(img.a))
+		{
+			img.rgb = vec3(params.nanR, params.nanG, params.nanB);
+		}
+		if (isinf(img.r) || isinf(img.g) || isinf(img.b) || isinf(img.a))
+		{
+			img.rgb = vec3(params.infR, params.infG, params.infB);
+		}
+	}
 
 	if(channel == -1){
 		imageStore(image_out, coord, img);}

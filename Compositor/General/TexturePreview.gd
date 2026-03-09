@@ -31,6 +31,13 @@ const shader_path: String = "res://Compositor/General/Texture_preview.glsl"
 ## Message from the script
 @export_multiline() var msg: String
 
+@export_group("Errors")
+@export var show_nan_inf: bool
+@export var nan_color: Color = Color(1,0,1)
+@export var inf_color: Color = Color(0,1,1)
+@export var screen_fade: float = 1
+
+
 var shader: RID
 var pipeline: RID
 
@@ -78,14 +85,23 @@ func _render_view(view : int) -> void:
 			msg = "Texture var doesn't exist or is wrong :("
 			return
 	else:
-		msg = "Provide conext and in OR compositor effect and texture RID var name."
-		return
+		if show_nan_inf:
+			msg = "Displaying error debug"
+			texture = render_scene_buffers.get_color_texture()
+		else:
+			msg = "Provide context and id OR compositor effect and texture RID var name.
+'Show Nan Inf' to show texture errors."
+			return
 	
 	render_size /= size_div
 	
 	run_compute_shader("Preview", shader, pipeline, 
 	[[get_color_image_uniform(view, 0), get_sampler_uniform(texture, nearest_sampler if !linear else linear_sampler, 1)]],
-	create_push_constant([Vector2(render_size), int(channel)]))
+	create_push_constant([Vector2(render_size), int(channel), 
+	1 if show_nan_inf else 0, 0,
+	nan_color.r, nan_color.g, nan_color.b,
+	inf_color.r, inf_color.g, inf_color.b,
+	1.0 - screen_fade]))
 
 
 func _render_setup() -> void: pass
