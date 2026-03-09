@@ -395,7 +395,7 @@ func array_to_bytes(p_data: Array) -> PackedByteArray:
 				byte_array.encode_s32(8, value.z)
 				byte_array.encode_s32(12, value.w)
 			_:
-				push_error("[DFOutlineCE:create_uniform_buffer()] Unhandled data type found: %s" % type)
+				push_error("[CompositorEffect: create_uniform_buffer()] Unhandled data type found: %s" % type)
 				continue
 
 		byte_data.append_array(byte_array)
