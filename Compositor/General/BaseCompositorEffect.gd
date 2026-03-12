@@ -566,6 +566,33 @@ func set_workgroups(size: int) -> void:
 	)
 
 
+## Called on render function start, use it to change to different size and resolution when shader pass requires it.
+func set_workgroups_resolution(size: int, res: Vector2i) -> void:
+	_workgroups = Vector3i(
+		ceil(((float(res.x) - 1) / size) + 1),
+		ceil(((float(res.y) - 1) / size) + 1),
+		1,
+	)
+
+
+## Called on render function start, use it to change to different size when shader pass requires it.
+func set_workgroups_xyz(x: int, y: int, z: int) -> void:
+	_workgroups = Vector3i(
+		ceil(((float(render_size.x) - 1) / x) + 1),
+		ceil(((float(render_size.y) - 1) / y) + 1),
+		z,
+	)
+
+
+## Called on render function start, use it to change to different size and resolution when shader pass requires it.
+func set_workgroups_xyz_resolution(x: int, y: int, z: int, res: Vector2i) -> void:
+	_workgroups = Vector3i(
+		ceil(((float(res.x) - 1) / x) + 1),
+		ceil(((float(res.y) - 1) / y) + 1),
+		z,
+	)
+
+
 func get_projection(inverse: bool, view: int) -> PackedFloat32Array:
 	var view_proj = render_scene_data.get_view_projection(view)
 	if inverse: view_proj = view_proj.inverse()
