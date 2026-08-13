@@ -598,8 +598,9 @@ func set_workgroups_xyz_resolution(x: int, y: int, z: int, res: Vector2i) -> voi
 	)
 
 
-func render_size_downscaled(divider: int) -> Vector2i:
-	return Vector2i(render_size.x >> divider-1, render_size.y >> divider-1)
+## Downscaled render size by steps of two
+func render_size_downscaled(step: int) -> Vector2i:
+	return Vector2i(render_size.x >> step, render_size.y >> step)
 
 
 func get_projection(inverse: bool, view: int) -> PackedFloat32Array:
