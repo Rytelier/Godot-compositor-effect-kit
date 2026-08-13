@@ -91,7 +91,7 @@ func _init():
 
 
 func _reload(files: PackedStringArray):
-	for file in files:
+	for file: String in files:
 		if _shader_file_paths.has(file):
 			_clean_rids()
 			_initialize_resource()
@@ -192,6 +192,8 @@ func create_shader(p_file_path: String, p_id = "") -> RID:
 	
 	var shader: RID = rd.shader_create_from_spirv(shader_spirv)
 	add_rid_to_free(shader, shader_id)
+	if p_file_path.begins_with("uid"):
+		p_file_path = ResourceUID.uid_to_path(p_file_path)
 	_shader_file_paths.append(p_file_path)
 	
 	return shader
