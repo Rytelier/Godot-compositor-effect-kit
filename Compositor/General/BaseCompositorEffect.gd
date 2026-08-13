@@ -325,21 +325,24 @@ func create_texture(
 		p_texture_size: Vector2i = Vector2i.ZERO, 
 		p_format: RenderingDevice.DataFormat = RenderingDevice.DATA_FORMAT_R16G16B16A16_SFLOAT,
 		p_usage_bits: int = RenderingDevice.TEXTURE_USAGE_SAMPLING_BIT | RenderingDevice.TEXTURE_USAGE_STORAGE_BIT,
+		p_mipmaps: int = 0
 		) -> RID:
 	var texture: RID = rd.texture_create(
 		get_texture_format(p_texture_size if p_texture_size != Vector2i.ZERO else render_size,
-		p_format, p_usage_bits)
+		p_format, p_usage_bits, p_mipmaps)
 		, RDTextureView.new())
 	add_rid_to_free(texture, "tex " + str(_rids_to_free.size()))
 	return texture
 
 
-func get_texture_format(p_texture_size: Vector2i, p_format: RenderingDevice.DataFormat, p_usage_bits: int) -> RDTextureFormat:
+func get_texture_format(p_texture_size: Vector2i, p_format: RenderingDevice.DataFormat, p_usage_bits: int, p_mipmaps: int = 0) -> RDTextureFormat:
 	var texture_format := RDTextureFormat.new()
 	texture_format.width = p_texture_size.x
 	texture_format.height = p_texture_size.y
 	texture_format.format = p_format
 	texture_format.usage_bits = p_usage_bits
+	if p_mipmaps > 0:
+		texture_format.mipmaps = p_mipmaps
 	
 	return texture_format
 
@@ -449,7 +452,7 @@ func get_image_uniform(p_image_rid: RID, p_binding: int = 0) -> RDUniform:
 	return uniform
 
 
-func get_sampler_uniform(p_image_rid: RID, p_sampler: RID, p_binding: int = 0, ) -> RDUniform:
+func get_sampler_uniform(p_image_rid: RID, p_sampler: RID, p_binding: int = 0) -> RDUniform:
 	var uniform: RDUniform = RDUniform.new()
 	uniform.uniform_type = RenderingDevice.UNIFORM_TYPE_SAMPLER_WITH_TEXTURE
 	uniform.binding = p_binding
