@@ -1,6 +1,6 @@
 @tool
 extends R_BaseCompositorEffect
-class_name CompositorTexturePreview
+class_name TexturePreview
 
 
 const shader_path: String = "res://Compositor/General/Texture_preview.glsl"
