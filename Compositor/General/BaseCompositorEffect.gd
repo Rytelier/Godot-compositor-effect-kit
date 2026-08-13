@@ -494,8 +494,8 @@ func run_compute_shader(p_label: String, p_shader: RID,
 func create_push_constant(p_push_constant: Array) -> PackedByteArray:
 	var byte_array: PackedByteArray = array_to_bytes(p_push_constant)
 	var size_before: int = byte_array.size()
-	if byte_array.size() % 16:
-		byte_array.resize(ceili(float(byte_array.size())/16.0) * 16)
+	if byte_array.size() % 4:
+		byte_array.resize(ceili(float(byte_array.size())/4.0) * 4)
 		if print_buffer_resize:
 			var size_change := byte_array.size() - size_before
 			print("\tPush constant resized from %s to %s." % [size_before, byte_array.size()])
